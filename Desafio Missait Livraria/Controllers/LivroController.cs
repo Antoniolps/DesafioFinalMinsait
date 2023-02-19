@@ -1,4 +1,5 @@
 ﻿using Desafio_Missait_Livraria.Migrations;
+using Desafio_Missait_Livraria.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata.Ecma335;
@@ -30,12 +31,12 @@ namespace Desafio_Missait_Livraria.Controllers
                 Titulo = request.Titulo,
                 SubTitulo = request.SubTitulo,
                 Resumo = request.Resumo,
-                QtdPaginas= request.QtdPaginas,
+                QtdPaginas = request.QtdPaginas,
                 DataPublicacao = request.DataPublicacao,
-                Editora= request.Editora,
+                Editora = request.Editora,
                 Edicao = request.Edicao,
             };
-            
+
             _context.Livros.Add(novoLivro);
             await _context.SaveChangesAsync();
 
@@ -54,7 +55,7 @@ namespace Desafio_Missait_Livraria.Controllers
                 return NotFound();
 
             var autor = await _context.Autores.FindAsync(request.IDAutor);
-            if (autor == null) 
+            if (autor == null)
                 return NotFound();
 
             livro.Autores.Add(autor);
@@ -62,5 +63,44 @@ namespace Desafio_Missait_Livraria.Controllers
 
             return livro;
         }
+
+        [HttpPut]
+        public async Task<ActionResult<Livro>> AtualizarLivro(AlterarLivroDto request)
+        {
+            var livro = await _context.Livros
+                .Where(l => l.ID == request.ID)
+                .Include(l => l.Autores)
+                .FirstOrDefaultAsync();
+
+            if (livro == null)
+                return NotFound();
+
+            livro.Titulo = request.Titulo;
+            livro.SubTitulo = request.SubTitulo;
+            livro.Resumo = request.Resumo;
+            livro.QtdPaginas = request.QtdPaginas;
+            livro.DataPublicacao = request.DataPublicacao;
+            livro.Editora = request.Editora;
+            livro.Edicao = request.Edicao;
+            await _context.SaveChangesAsync();
+
+            return livro;
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<List<Livro>>> Delete(Guid id)
+        {
+            var dbLivro = await _context.Livros.FindAsync(id);
+            if(dbLivro== null) 
+                return NotFound();
+
+            _context.Livros.Remove(dbLivro);
+            await _context.SaveChangesAsync();
+
+            return Ok(await _context.Livros.ToListAsync());
+        }
+        
+
+        
     }
 }

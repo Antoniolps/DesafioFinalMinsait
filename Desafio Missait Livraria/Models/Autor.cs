@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace Desafio_Missait_Livraria
+namespace Desafio_Missait_Livraria.Models
 {
     public class Autor
     {
@@ -13,6 +13,6 @@ namespace Desafio_Missait_Livraria
 
         [ForeignKey(nameof(Livro))]
         [JsonIgnore]
-        public List<Livro> Livros{ get; set; }  
+        public List<Livro> Livros { get; set; }
     }
 }

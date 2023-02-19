@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Desafio_Missait_Livraria.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Desafio_Missait_Livraria.Data
 {

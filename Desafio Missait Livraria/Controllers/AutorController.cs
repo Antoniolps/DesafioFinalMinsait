@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Desafio_Missait_Livraria.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,6 +34,36 @@ namespace Desafio_Missait_Livraria.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(novoAutor);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<Autor>> AtualizarAutor(AlterarAutorDto request)
+        {
+            var autor = await _context.Autores
+                .Where(a => a.ID == request.ID)
+                .Include(a => a.Livros)
+                .FirstOrDefaultAsync();
+
+            if (autor == null)
+                return NotFound();
+
+            autor.Nome = request.Nome;
+            await _context.SaveChangesAsync();
+
+            return autor;
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<List<Autor>>> Delete(Guid id)
+        {
+            var dbAutor = await _context.Autores.FindAsync(id);
+            if (dbAutor == null)
+                return NotFound();
+
+            _context.Autores.Remove(dbAutor);
+            await _context.SaveChangesAsync();
+
+            return Ok(await _context.Autores.ToListAsync());
         }
     }
 }

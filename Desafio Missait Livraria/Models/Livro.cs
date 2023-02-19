@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace Desafio_Missait_Livraria
+namespace Desafio_Missait_Livraria.Models
 {
     public class Livro
     {
