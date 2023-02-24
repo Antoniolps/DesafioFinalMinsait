@@ -1,7 +1,10 @@
-﻿namespace Desafio_Missait_Livraria.Models
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace Desafio_Missait_Livraria.Models
 {
     public class CriarLivroDto
-    {
+    { 
         public string Titulo { get; set; }
         public string SubTitulo { get; set; }
         public string Resumo { get; set; }
@@ -9,5 +12,7 @@
         public DateTime DataPublicacao { get; set; }
         public string Editora { get; set; }
         public int Edicao { get; set; }
+        public string autorNome { get; set; }
+
     }
 }

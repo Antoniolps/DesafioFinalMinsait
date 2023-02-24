@@ -22,16 +22,29 @@ namespace Desafio_Missait_Livraria.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<Autor>>> Create(CriarAutorDto request)
+        public async Task<ActionResult<Autor>> Create(CriarAutorDto request)
         {
-            var novoAutor = new Autor
-            {
-                ID = Guid.NewGuid(),
-                Nome = request.nome
-            };
+            var novoAutor = new Autor();
+            var pesquisaAutor = await _context.Autores
+                .Where(autor => autor.Nome.Equals(request.Nome))
+                .FirstOrDefaultAsync();
 
-            _context.Autores.Add(novoAutor);
-            await _context.SaveChangesAsync();
+         
+            if (pesquisaAutor == null)
+            {
+                novoAutor = new Autor
+                {
+                    ID = Guid.NewGuid(),
+                    Nome = request.Nome
+                };
+                _context.Autores.Add(novoAutor);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                novoAutor = pesquisaAutor;
+            }
+     
 
             return Ok(novoAutor);
         }

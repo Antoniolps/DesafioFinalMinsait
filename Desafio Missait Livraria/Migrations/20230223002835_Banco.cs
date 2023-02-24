@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Desafio_Missait_Livraria.Migrations
 {
     /// <inheritdoc />
-    public partial class Livros : Migration
+    public partial class Banco : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

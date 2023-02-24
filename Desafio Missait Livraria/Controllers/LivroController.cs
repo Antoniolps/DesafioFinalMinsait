@@ -1,8 +1,7 @@
-﻿using Desafio_Missait_Livraria.Migrations;
-using Desafio_Missait_Livraria.Models;
+﻿using Desafio_Missait_Livraria.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Metadata.Ecma335;
+
 
 namespace Desafio_Missait_Livraria.Controllers
 {
@@ -25,6 +24,12 @@ namespace Desafio_Missait_Livraria.Controllers
         [HttpPost]
         public async Task<ActionResult<List<Livro>>> Create(CriarLivroDto request)
         {
+            var titulo = await _context.Livros.Where(l => l.Titulo.Equals(request.Titulo)).FirstOrDefaultAsync();
+
+            if (titulo != null)
+                return BadRequest("Livro já existe");
+
+            var autorNovo = new Autor();
             var novoLivro = new Livro
             {
                 ID = Guid.NewGuid(),
@@ -34,11 +39,39 @@ namespace Desafio_Missait_Livraria.Controllers
                 QtdPaginas = request.QtdPaginas,
                 DataPublicacao = request.DataPublicacao,
                 Editora = request.Editora,
-                Edicao = request.Edicao,
+                Edicao = request.Edicao
             };
 
             _context.Livros.Add(novoLivro);
             await _context.SaveChangesAsync();
+
+            var autor = await _context.Autores
+                .Where(autor => autor.Nome.Equals(request.autorNome))
+                .FirstOrDefaultAsync();
+            
+            if(autor == null)
+            {
+                autorNovo = new Autor
+                {
+                    ID = Guid.NewGuid(),
+                    Nome = request.autorNome
+                };
+                _context.Autores.Add(autorNovo);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                autorNovo = autor;
+            }
+            
+
+            var autorLivro = new AutordoLivroDto
+            {
+                IDLivro = novoLivro.ID,
+                IDAutor = autorNovo.ID
+            };
+
+            await AddAutorLivro(autorLivro);
 
             return Ok(novoLivro);
         }
@@ -84,7 +117,7 @@ namespace Desafio_Missait_Livraria.Controllers
             livro.Edicao = request.Edicao;
             await _context.SaveChangesAsync();
 
-            return livro;
+            return Ok(livro);
         }
 
         [HttpDelete("{id}")]
@@ -99,8 +132,29 @@ namespace Desafio_Missait_Livraria.Controllers
 
             return Ok(await _context.Livros.ToListAsync());
         }
-        
 
-        
+        [HttpPost("ApagarAutor")]
+        public async Task<ActionResult<Livro>> Delete(AutordoLivroDto request)
+        {
+            var livro = await _context.Livros
+                .Where(l => l.ID == request.IDLivro)
+                .Include(l => l.Autores)
+                .FirstOrDefaultAsync();
+
+            if (livro == null)
+                return NotFound();
+
+            var autor = await _context.Autores.FindAsync(request.IDAutor);
+            if (autor == null)
+                return NotFound();
+
+            livro.Autores.Remove(autor);
+            await _context.SaveChangesAsync();
+
+            return Ok(livro);
+        }
+
+
+
     }
 }

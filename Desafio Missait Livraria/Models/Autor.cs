@@ -14,5 +14,10 @@ namespace Desafio_Missait_Livraria.Models
         [ForeignKey(nameof(Livro))]
         [JsonIgnore]
         public List<Livro> Livros { get; set; }
+
+        public static explicit operator Autor(Task<Autor?> v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

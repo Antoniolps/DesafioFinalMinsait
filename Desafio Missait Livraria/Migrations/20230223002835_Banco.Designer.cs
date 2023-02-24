@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Desafio_Missait_Livraria.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230218180309_Livros")]
-    partial class Livros
+    [Migration("20230223002835_Banco")]
+    partial class Banco
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,7 +40,7 @@ namespace Desafio_Missait_Livraria.Migrations
                     b.ToTable("AutorLivro");
                 });
 
-            modelBuilder.Entity("Desafio_Missait_Livraria.Autor", b =>
+            modelBuilder.Entity("Desafio_Missait_Livraria.Models.Autor", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
@@ -55,7 +55,7 @@ namespace Desafio_Missait_Livraria.Migrations
                     b.ToTable("Autores");
                 });
 
-            modelBuilder.Entity("Desafio_Missait_Livraria.Livro", b =>
+            modelBuilder.Entity("Desafio_Missait_Livraria.Models.Livro", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
@@ -94,13 +94,13 @@ namespace Desafio_Missait_Livraria.Migrations
 
             modelBuilder.Entity("AutorLivro", b =>
                 {
-                    b.HasOne("Desafio_Missait_Livraria.Livro", null)
+                    b.HasOne("Desafio_Missait_Livraria.Models.Livro", null)
                         .WithMany()
                         .HasForeignKey("Autor")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Desafio_Missait_Livraria.Autor", null)
+                    b.HasOne("Desafio_Missait_Livraria.Models.Autor", null)
                         .WithMany()
                         .HasForeignKey("Livro")
                         .OnDelete(DeleteBehavior.Cascade)
