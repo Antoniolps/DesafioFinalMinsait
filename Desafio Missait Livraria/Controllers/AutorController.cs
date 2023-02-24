@@ -24,6 +24,8 @@ namespace Desafio_Missait_Livraria.Controllers
         [HttpPost]
         public async Task<ActionResult<Autor>> Create(CriarAutorDto request)
         {
+            LivroController livroController = new LivroController(_context);
+
             var novoAutor = new Autor();
             var pesquisaAutor = await _context.Autores
                 .Where(autor => autor.Nome.Equals(request.Nome))
@@ -44,7 +46,14 @@ namespace Desafio_Missait_Livraria.Controllers
             {
                 novoAutor = pesquisaAutor;
             }
-     
+
+            var associar = new AutordoLivroDto
+            {
+                IDLivro = request.idLivro,
+                IDAutor = novoAutor.ID
+            };
+
+            await livroController.AddAutorLivro(associar);
 
             return Ok(novoAutor);
         }
