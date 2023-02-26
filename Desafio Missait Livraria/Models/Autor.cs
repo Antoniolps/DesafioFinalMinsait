@@ -15,9 +15,5 @@ namespace Desafio_Missait_Livraria.Models
         [JsonIgnore]
         public List<Livro> Livros { get; set; }
 
-        public static explicit operator Autor(Task<Autor?> v)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

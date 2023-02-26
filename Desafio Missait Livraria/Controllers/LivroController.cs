@@ -21,10 +21,28 @@ namespace Desafio_Missait_Livraria.Controllers
             return await _context.Livros.Include(l => l.Autores).ToListAsync();
         }
 
+        [HttpPost("Busca")]
+        public async Task<ActionResult<List<Livro>>> getLivroByTitulo(buscarLivroDto request)
+        {
+            return await _context.Livros.Where(l => l.Titulo == request.Titulo).Include(l=> l.Autores).ToListAsync();
+        }
+
+        [HttpPost("Busca/Autor")]
+        public async Task<ActionResult<List<Livro>>> getLivroByAutor(buscarAutorDto request)
+        {
+            var autor = await _context.Autores.Where(a => a.Nome == request.Nome).FirstOrDefaultAsync();
+            if(autor == null)
+                return NotFound("Autor não encontrado");
+
+            var livros = await _context.Livros.Where(l => l.Autores.Contains(autor)).Include(l=> l.Autores).ToListAsync();
+
+            return livros;
+        }
+
         [HttpPost]
         public async Task<ActionResult<List<Livro>>> Create(CriarLivroDto request)
         {
-            var titulo = await _context.Livros.Where(l => l.Titulo.Equals(request.Titulo)).FirstOrDefaultAsync();
+            var titulo = await _context.Livros.Where(l => l.Titulo.Equals(request.Titulo)).Where(l => l.DataPublicacao == request.DataPublicacao).FirstOrDefaultAsync();
 
             if (titulo != null)
                 return BadRequest("Livro já existe");
@@ -73,7 +91,7 @@ namespace Desafio_Missait_Livraria.Controllers
 
             await AddAutorLivro(autorLivro);
 
-            return Ok(novoLivro);
+            return Ok(await _context.Livros.Include(l => l.Autores).ToListAsync());
         }
 
         [HttpPost("Autor")]
@@ -130,7 +148,7 @@ namespace Desafio_Missait_Livraria.Controllers
             _context.Livros.Remove(dbLivro);
             await _context.SaveChangesAsync();
 
-            return Ok(await _context.Livros.ToListAsync());
+            return Ok(await _context.Livros.Include(l=> l.Autores).ToListAsync());
         }
 
         [HttpPost("ApagarAutor")]
