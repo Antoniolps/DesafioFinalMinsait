@@ -22,7 +22,7 @@ namespace Desafio_Missait_Livraria.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Autor>> Create(CriarAutorDto request)
+        public async Task<ActionResult<List<Livro>>> Create(CriarAutorDto request)
         {
             LivroController livroController = new LivroController(_context);
 
@@ -55,11 +55,11 @@ namespace Desafio_Missait_Livraria.Controllers
 
             await livroController.AddAutorLivro(associar);
 
-            return Ok(novoAutor);
+            return Ok(await _context.Livros.Include(l => l.Autores).ToListAsync());
         }
 
         [HttpPut]
-        public async Task<ActionResult<Autor>> AtualizarAutor(AlterarAutorDto request)
+        public async Task<ActionResult<List<Livro>>> AtualizarAutor(AlterarAutorDto request)
         {
             var autor = await _context.Autores
                 .Where(a => a.ID == request.ID)
@@ -72,11 +72,11 @@ namespace Desafio_Missait_Livraria.Controllers
             autor.Nome = request.Nome;
             await _context.SaveChangesAsync();
 
-            return autor;
+            return Ok(await _context.Livros.Include(l => l.Autores).ToListAsync());
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<List<Autor>>> Delete(Guid id)
+        public async Task<ActionResult<List<Livro>>> Delete(Guid id)
         {
             var dbAutor = await _context.Autores.FindAsync(id);
             if (dbAutor == null)
@@ -85,7 +85,7 @@ namespace Desafio_Missait_Livraria.Controllers
             _context.Autores.Remove(dbAutor);
             await _context.SaveChangesAsync();
 
-            return Ok(await _context.Autores.ToListAsync());
+            return Ok(await _context.Livros.Include(l => l.Autores).ToListAsync());
         }
     }
 }

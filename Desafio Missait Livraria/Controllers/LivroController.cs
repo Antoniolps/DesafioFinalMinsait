@@ -21,16 +21,26 @@ namespace Desafio_Missait_Livraria.Controllers
             return await _context.Livros.Include(l => l.Autores).ToListAsync();
         }
 
-        [HttpPost("Busca")]
-        public async Task<ActionResult<List<Livro>>> getLivroByTitulo(buscarLivroDto request)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Livro>> GetById(Guid id)
         {
-            return await _context.Livros.Where(l => l.Titulo == request.Titulo).Include(l=> l.Autores).ToListAsync();
+            var livro = await _context.Livros.Where(l => l.ID == id).Include(l => l.Autores).FirstOrDefaultAsync();
+            if (livro != null)
+                return Ok(livro);
+            else
+                return NotFound();
+        }
+
+        [HttpPost("Busca")]
+        public async Task<ActionResult<List<Livro>>> getLivroByTitulo(buscarDto request)
+        {
+            return await _context.Livros.Where(l => l.Titulo == request.paraPesquisar).Include(l=> l.Autores).ToListAsync();
         }
 
         [HttpPost("Busca/Autor")]
-        public async Task<ActionResult<List<Livro>>> getLivroByAutor(buscarAutorDto request)
+        public async Task<ActionResult<List<Livro>>> getLivroByAutor(buscarDto request)
         {
-            var autor = await _context.Autores.Where(a => a.Nome == request.Nome).FirstOrDefaultAsync();
+            var autor = await _context.Autores.Where(a => a.Nome == request.paraPesquisar).FirstOrDefaultAsync();
             if(autor == null)
                 return NotFound("Autor não encontrado");
 
@@ -95,7 +105,7 @@ namespace Desafio_Missait_Livraria.Controllers
         }
 
         [HttpPost("Autor")]
-        public async Task<ActionResult<Livro>> AddAutorLivro(AutordoLivroDto request)
+        public async Task<ActionResult<List<Livro>>> AddAutorLivro(AutordoLivroDto request)
         {
             var livro = await _context.Livros
                 .Where(l => l.ID == request.IDLivro)
@@ -112,11 +122,11 @@ namespace Desafio_Missait_Livraria.Controllers
             livro.Autores.Add(autor);
             await _context.SaveChangesAsync();
 
-            return livro;
+            return Ok(await _context.Livros.Include(l => l.Autores).ToListAsync());
         }
 
         [HttpPut]
-        public async Task<ActionResult<Livro>> AtualizarLivro(AlterarLivroDto request)
+        public async Task<ActionResult<List<Livro>>> AtualizarLivro(AlterarLivroDto request)
         {
             var livro = await _context.Livros
                 .Where(l => l.ID == request.ID)
@@ -135,7 +145,7 @@ namespace Desafio_Missait_Livraria.Controllers
             livro.Edicao = request.Edicao;
             await _context.SaveChangesAsync();
 
-            return Ok(livro);
+            return Ok(await _context.Livros.Include(l => l.Autores).ToListAsync());
         }
 
         [HttpDelete("{id}")]
@@ -152,7 +162,7 @@ namespace Desafio_Missait_Livraria.Controllers
         }
 
         [HttpPost("ApagarAutor")]
-        public async Task<ActionResult<Livro>> Delete(AutordoLivroDto request)
+        public async Task<ActionResult<List<Livro>>> Delete(AutordoLivroDto request)
         {
             var livro = await _context.Livros
                 .Where(l => l.ID == request.IDLivro)
@@ -169,7 +179,7 @@ namespace Desafio_Missait_Livraria.Controllers
             livro.Autores.Remove(autor);
             await _context.SaveChangesAsync();
 
-            return Ok(livro);
+            return Ok(await _context.Livros.Include(l => l.Autores).ToListAsync());
         }
 
 
